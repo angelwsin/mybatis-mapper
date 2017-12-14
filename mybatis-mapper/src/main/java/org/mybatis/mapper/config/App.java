@@ -10,7 +10,8 @@ public class App
 {
     public static void main( String[] args )
     {
-       // SqlSessionFactoryBuilder
+       //SqlSessionFactoryBuilder
+       GeneratorAntTask
     	
     	/*<mapper  tableName=''>
 
