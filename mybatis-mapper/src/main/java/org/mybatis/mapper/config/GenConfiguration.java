@@ -5,6 +5,8 @@ import org.mybatis.mapper.scripting.XmlGenLanguageDriver;
 
 public class GenConfiguration extends Configuration{
 	
+	
+	
 	public GenConfiguration(){
 		super();
 		typeAliasRegistry.registerAlias("GenScript", XmlGenLanguageDriver.class);

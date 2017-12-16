@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import org.mybatis.mapper.mybatis_mapper.AppTest;
 import org.mybatis.mapper.xml.XMLGenConfigBuilder;
+import org.w3c.dom.Document;
 
 /**
  * Hello world!
@@ -14,7 +15,7 @@ public class App
     public static void main( String[] args )
     {
        //SqlSessionFactoryBuilder
-      // GeneratorAntTask
+      //GeneratorAntTask
     	
     	/*<mapper  tableName=''>
 
@@ -30,9 +31,10 @@ public class App
     		System.out.println(is==null);
     		XMLGenConfigBuilder config = new XMLGenConfigBuilder(is);
     		config.parse();
-    		config.getConfiguration().getEnvironment().getDataSource();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    	
+    	//Document document = 
     }
 }

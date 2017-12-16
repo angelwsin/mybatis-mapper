@@ -5,6 +5,6 @@
 <mapper namespace="com.mybatis.mapper.UserMapper" tableName="user">  
     
     
-    <select id="findById"  result="object"/>  
+    <select id="findById" colums="id,name" result="object"/>  
      
 </mapper>

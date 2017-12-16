@@ -37,7 +37,7 @@ import org.apache.ibatis.type.TypeHandler;
 public class XMLGenMapperBuilder extends BaseBuilder {
 
 	  private final XPathParser parser;
-	  private final MapperBuilderAssistant builderAssistant;
+	  private final MapperGenBuilderAssistant builderAssistant;
 	  private final Map<String, XNode> sqlFragments;
 	  private final String resource;
 
@@ -54,7 +54,7 @@ public class XMLGenMapperBuilder extends BaseBuilder {
 
 	  private XMLGenMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map<String, XNode> sqlFragments) {
 	    super(configuration);
-	    this.builderAssistant = new MapperBuilderAssistant(configuration, resource);
+	    this.builderAssistant = new MapperGenBuilderAssistant(configuration, resource);
 	    this.parser = parser;
 	    this.sqlFragments = sqlFragments;
 	    this.resource = resource;
@@ -87,6 +87,7 @@ public class XMLGenMapperBuilder extends BaseBuilder {
 		        throw new BuilderException("Mapper's tableName cannot be empty");
 		    }
 	      builderAssistant.setCurrentNamespace(namespace);
+	      builderAssistant.setCurrentTableName(tableName);
 	      sqlElement(context.evalNodes("/mapper/sql"));
 	      buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
 	    } catch (Exception e) {

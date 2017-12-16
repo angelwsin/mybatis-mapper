@@ -1,13 +1,10 @@
 package org.mybatis.mapper.scripting.xmltags;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
 
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.BuilderException;
@@ -15,7 +12,6 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.scripting.xmltags.ChooseSqlNode;
-import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.apache.ibatis.scripting.xmltags.IfSqlNode;
 import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
@@ -33,7 +29,7 @@ import org.w3c.dom.NodeList;
 public class XMLGenScriptBuilder extends BaseBuilder {
 
 	  private final XNode context;
-	  private boolean isDynamic;
+	  private boolean isDynamic = true;
 	  private final Class<?> parameterType;
 
 	  public XMLGenScriptBuilder(Configuration configuration, XNode context) {
@@ -47,11 +43,11 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	  }
 
 	  public SqlSource parseScriptNode() {
-	    List<SqlNode> contents = parseDynamicTags(context);
+	    List<SqlNode> contents = parseDynamicAttrs(context);
 	    MixedSqlNode rootSqlNode = new MixedSqlNode(contents);
 	    SqlSource sqlSource = null;
 	    if (isDynamic) {
-	      sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
+	      sqlSource = new DynamicGenSqlSource(configuration, rootSqlNode);
 	    } else {
 	      sqlSource = new RawSqlSource(configuration, rootSqlNode, parameterType);
 	    }
@@ -87,22 +83,20 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	    return contents;
 	  }
 	  
-	  List<SqlNode> parseDynamicAttrs(XNode node,List<SqlNode> contents) {
+	  List<SqlNode> parseDynamicAttrs(XNode node) {
+		  List<SqlNode> contents = new ArrayList<SqlNode>();
 		  String where = context.getStringAttribute("where");
 		  String colums = context.getStringAttribute("colums");
 		  String orderBy = context.getStringAttribute("orderBy");
-		  int intWhere  = 0;
 		  if(Objects.nonNull(where)&&!where.equals("")){
-			  String[] wheres = where.split(",");
-			  intWhere = wheres.length;
+			  contents.add(new WhereGenSqlNode(where));
 		  }
-		  int intCols = 0 ;
 		  if(Objects.nonNull(colums)&&!colums.equals("")){
-			  String[] cols = where.split(",");
-			  intCols = cols.length;
+			  contents.add(new ColumsGenSqlNode(colums));
 		  }
-		  
-		   configuration.getEnvironment().getDataSource();
+		  if(Objects.nonNull(orderBy)&&!orderBy.equals("")){
+			  contents.add(new TextGenSqlNode(orderBy));
+		  }
 		   return contents;
 		  }
 

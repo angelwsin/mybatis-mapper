@@ -81,11 +81,10 @@ public class XMLGenStatementBuilder extends BaseBuilder {
 	          configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
 	          ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
 	    }
-        System.out.println(sqlSource);
-	    /*builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
-	        fetchSize, timeout, parameterMap, parameterTypeClass, resultMap, resultTypeClass,
-	        resultSetTypeEnum, flushCache, useCache, resultOrdered, 
-	        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);*/
+	    builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
+	        0, 0, null, parameterTypeClass, null, resultTypeClass,
+	        null, false, false, false, 
+	        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
 	  }
 
 	  private void processSelectKeyNodes(String id, Class<?> parameterTypeClass, LanguageDriver langDriver) {
