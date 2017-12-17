@@ -1,8 +1,6 @@
 package org.mybatis.mapper.xml;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
@@ -16,18 +14,28 @@ import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
+import org.mybatis.generator.config.Context;
+import org.mybatis.generator.internal.db.DatabaseGenIntrospector;
 import org.mybatis.mapper.config.Const;
+import org.mybatis.mapper.config.GenConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MapperGenBuilderAssistant extends MapperBuilderAssistant{
+	
+	private static Logger logger = LoggerFactory.getLogger(MapperGenBuilderAssistant.class);
 	
 	private String currentTableName;
 	
 	private String currentCatalog;
 	
 	private String currentSchema;
+	
+	
 
 	public MapperGenBuilderAssistant(Configuration configuration, String resource) {
 		super(configuration, resource);
+		
 	}
 
 	public String getCurrentTableName() {
@@ -77,12 +85,9 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant{
 		Configuration conf = getConfiguration();
 		DataSource dataSource = conf.getEnvironment().getDataSource();
 		try (Connection con = dataSource.getConnection();){
-			DatabaseMetaData metaData = 	con.getMetaData();
-			ResultSet reSet = metaData.getColumns(getCurrentCatalog(), getCurrentSchema(), getCurrentTableName(), null);
-			while(reSet.next()){
-			String columName =   reSet.getString("COLUMN_NAME");
-			System.out.println(columName);
-			}
+			
+			DatabaseGenIntrospector dataIntrosp = new DatabaseGenIntrospector(con.getMetaData(),getContext() );
+			dataIntrosp.getColumns(this);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -91,4 +96,13 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant{
 		System.out.println(boundSql.getAdditionalParameter(Const.COLUMS));*/
 		return null;
 	}
+	
+	
+	private Context getContext(){
+		return  ((GenConfiguration)getConfiguration()).getContext();
+	}
+	
+	
+	
+	
 }

@@ -8,7 +8,7 @@
    
    </settings> -->
 
-    <properties resource="db.properties"></properties>
+    <properties resource="db.properties"/>
     <environments default="development">  
        <environment id="development">
            <transactionManager type="JDBC" />  
@@ -25,4 +25,38 @@
        <mapper resource="user_gen.xml"/>
       <!--  <package name="com.tiantian.mybatis.mapperinterface"/>   -->
     </mappers> 
+    <context id="yihaomen_mysql_tables" targetRuntime="MyBatis3">
+
+    <!-- 为了防止生成的代码中有很多注释，比较难看，加入下面的配置控制 -->
+    <commentGenerator>
+      <property name="suppressAllComments" value="true" />
+      <property name="suppressDate" value="true" />
+    </commentGenerator>
+    <!-- 注释控制完毕 -->
+
+    
+
+    <javaTypeResolver >
+      <property name="forceBigDecimals" value="false" />
+    </javaTypeResolver>
+
+    <!-- 数据表对应的model 层  -->
+    <javaModelGenerator targetPackage="com.yihaomen.model" targetProject="src">
+      <property name="enableSubPackages" value="true" />
+      <property name="trimStrings" value="true" />
+    </javaModelGenerator>
+
+    <!-- sql mapper 隐射配置文件 -->
+    <sqlMapGenerator targetPackage="com.yihaomen.mapper"  targetProject="src">
+      <property name="enableSubPackages" value="true" />
+    </sqlMapGenerator>
+
+    <!-- 在ibatis2 中是dao层，但在mybatis3中，其实就是mapper接口 -->
+    <javaClientGenerator type="XMLMAPPER" targetPackage="com.yihaomen.inter"  targetProject="src">
+      <property name="enableSubPackages" value="true" />
+    </javaClientGenerator>
+
+   
+
+  </context>
 </configuration>
