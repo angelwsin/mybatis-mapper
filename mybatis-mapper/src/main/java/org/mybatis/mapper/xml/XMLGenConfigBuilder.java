@@ -2,8 +2,6 @@ package org.mybatis.mapper.xml;
 
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -35,8 +33,6 @@ import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.mybatis.gen.mapper.xml.MyBatisGenContextParser;
-import org.mybatis.generator.config.xml.ConfigurationParser;
 import org.mybatis.mapper.config.GenConfiguration;
 
 public class XMLGenConfigBuilder extends BaseBuilder {
@@ -104,7 +100,6 @@ public class XMLGenConfigBuilder extends BaseBuilder {
 			environmentsElement(root.evalNode("environments"));
 			databaseIdProviderElement(root.evalNode("databaseIdProvider"));
 			typeHandlerElement(root.evalNode("typeHandlers"));
-			contextElement(root.evalNode("context"));
 			mapperElement(root.evalNode("mappers"));
 		} catch (Exception e) {
 			throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -392,15 +387,5 @@ public class XMLGenConfigBuilder extends BaseBuilder {
 		return false;
 	}
 
-	private void contextElement(XNode parent) throws Exception {
-		if (parent != null) {
-			GenConfiguration config = (GenConfiguration) getConfiguration();
-			MyBatisGenContextParser parser   = new 	MyBatisGenContextParser(config.getVariables());
-			parser.parseContext(config, parent.getNode());
-		}else {
-			throw new BuilderException(
-					"A context element may only specify a url, resource or class, but not more than one.");
-		}
-	}
 
 }

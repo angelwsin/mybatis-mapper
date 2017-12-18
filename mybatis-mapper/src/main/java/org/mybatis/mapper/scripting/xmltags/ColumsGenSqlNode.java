@@ -19,7 +19,7 @@ public class ColumsGenSqlNode implements SqlNode{
 	@Override
 	public boolean apply(DynamicContext context) {
 		if(Objects.nonNull(colums)){
-			context.bind(Const.COLUMS, colums);
+			context.appendSql(String.format("%s:%s", Const.COLUMS,colums));
 		}
 		return false;
 	}

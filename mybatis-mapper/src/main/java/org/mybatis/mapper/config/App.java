@@ -2,9 +2,7 @@ package org.mybatis.mapper.config;
 
 import java.io.InputStream;
 
-import org.mybatis.mapper.mybatis_mapper.AppTest;
 import org.mybatis.mapper.xml.XMLGenConfigBuilder;
-import org.w3c.dom.Document;
 
 /**
  * Hello world!

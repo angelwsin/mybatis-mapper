@@ -21,7 +21,7 @@ public class TextGenSqlNode implements SqlNode{
 	@Override
 	public boolean apply(DynamicContext context) {
 		if(Objects.nonNull(text)){
-			context.bind(Const.ORDER_BY, text);
+			context.appendSql(String.format("%s:%s", Const.ORDER_BY,text));
 		}
 		return true;
 	}

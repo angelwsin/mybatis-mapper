@@ -15,7 +15,7 @@ public class SqlGenSourceBuilder extends BaseBuilder {
 
 	public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
 
-		return new StaticSqlSource(configuration, null, null);
+		return new StaticSqlSource(configuration, originalSql, null);
 	}
 	
 

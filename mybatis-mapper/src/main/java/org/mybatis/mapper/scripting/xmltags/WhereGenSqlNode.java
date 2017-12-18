@@ -1,7 +1,6 @@
 package org.mybatis.mapper.scripting.xmltags;
 
 import java.util.Objects;
-import java.util.StringTokenizer;
 
 import org.apache.ibatis.scripting.xmltags.DynamicContext;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
@@ -22,7 +21,7 @@ public class WhereGenSqlNode implements SqlNode{
 	@Override
 	public boolean apply(DynamicContext context) {
 		if(Objects.nonNull(whereColums)){
-			context.bind(Const.WHERE_COLUMS, whereColums);
+			context.appendSql(String.format("%s:%s", Const.WHERE_COLUMS,whereColums));
 		}
 		return false;
 	}

@@ -1,6 +1,10 @@
 package org.mybatis.mapper.xml;
 
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,11 +15,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.CacheRefResolver;
 import org.apache.ibatis.builder.IncompleteElementException;
-import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.ResultMapResolver;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.builder.xml.XMLStatementBuilder;
@@ -33,6 +38,9 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
+import org.mybatis.generator.api.IntrospectedColumn;
+import org.mybatis.generator.codegen.Table;
+import org.mybatis.generator.codegen.xml.mapper.XMLMapperGenBuilder;
 
 public class XMLGenMapperBuilder extends BaseBuilder {
 
@@ -112,7 +120,84 @@ public class XMLGenMapperBuilder extends BaseBuilder {
 	       // configuration.addIncompleteStatement(statementParser);
 	      }
 	    }
+	    buildMapper();
 	  }
+	  
+	  public void buildMapper(){
+		  XMLMapperGenBuilder xmlMapperBuilder = new XMLMapperGenBuilder(configuration);
+		  xmlMapperBuilder.setIds(builderAssistant.getIds());
+		  Table table = new Table( builderAssistant.getCurrentTableName(),  colums());
+		  table.setMyBatisSqlMapNamespace(builderAssistant.getCurrentNamespace());
+		  xmlMapperBuilder.setIntrospectedTable(table);
+		  System.out.println(xmlMapperBuilder.getDocument().getFormattedContent());
+	  }
+	  
+	  private List<IntrospectedColumn> colums(){
+		    Configuration conf = getConfiguration();
+			DataSource dataSource = conf.getEnvironment().getDataSource();
+			 List<IntrospectedColumn> answer = new ArrayList<>();
+			try (Connection con = dataSource.getConnection();){
+			        ResultSet rs = con.getMetaData().getColumns(null, null,
+			        		builderAssistant.getCurrentTableName(), "%"); //$NON-NLS-1$
+			        
+			        boolean supportsIsAutoIncrement = false;
+			        boolean supportsIsGeneratedColumn = false;
+			        ResultSetMetaData rsmd = rs.getMetaData();
+			        int colCount = rsmd.getColumnCount();
+			        for (int i = 1; i <= colCount; i++) {
+			            if ("IS_AUTOINCREMENT".equals(rsmd.getColumnName(i))) { //$NON-NLS-1$
+			                supportsIsAutoIncrement = true;
+			            }
+			            if ("IS_GENERATEDCOLUMN".equals(rsmd.getColumnName(i))) { //$NON-NLS-1$
+			                supportsIsGeneratedColumn = true;
+			            }
+			        }
+
+			        while (rs.next()) {
+			            IntrospectedColumn introspectedColumn = new IntrospectedColumn();
+
+			            //introspectedColumn.setTableAlias(tc.getAlias());
+			            introspectedColumn.setJdbcType(rs.getInt("DATA_TYPE")); //$NON-NLS-1$
+			            introspectedColumn.setLength(rs.getInt("COLUMN_SIZE")); //$NON-NLS-1$
+			            introspectedColumn.setActualColumnName(rs.getString("COLUMN_NAME")); //$NON-NLS-1$
+			            introspectedColumn
+			                    .setNullable(rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable); //$NON-NLS-1$
+			            introspectedColumn.setScale(rs.getInt("DECIMAL_DIGITS")); //$NON-NLS-1$
+			            introspectedColumn.setRemarks(rs.getString("REMARKS")); //$NON-NLS-1$
+			            introspectedColumn.setDefaultValue(rs.getString("COLUMN_DEF")); //$NON-NLS-1$
+			            
+			            if (supportsIsAutoIncrement) {
+			                introspectedColumn.setAutoIncrement("YES".equals(rs.getString("IS_AUTOINCREMENT"))); //$NON-NLS-1$ //$NON-NLS-2$
+			            }
+			            
+			            if (supportsIsGeneratedColumn) {
+			                introspectedColumn.setGeneratedColumn("YES".equals(rs.getString("IS_GENERATEDCOLUMN"))); //$NON-NLS-1$ //$NON-NLS-2$
+			            }
+
+			            javabean(introspectedColumn);
+			            answer.add(introspectedColumn);
+
+			           
+			        }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return answer;
+	  }
+	  
+	 private void  javabean(IntrospectedColumn introspectedColumn){
+		 introspectedColumn.setJavaProperty(s(introspectedColumn.getActualColumnName()));
+		 
+	 } 
+	 
+	 private String  s(String colums){
+		String[] c =  colums.split("_");
+		StringBuilder b = new StringBuilder(c[0]);
+		for(int i=1;i<c.length;i++){
+			b.append(c[i].substring(0, 1).toUpperCase()).append(c[i].substring(1));
+		}
+		return b.toString();
+	 }
 
 	  private void parsePendingResultMaps() {
 	    Collection<ResultMapResolver> incompleteResultMaps = configuration.getIncompleteResultMaps();

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.ibatis.builder.BaseBuilder;
-import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.xml.XMLIncludeTransformer;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -19,18 +18,19 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
+import org.mybatis.mapper.config.Const;
 
 public class XMLGenStatementBuilder extends BaseBuilder {
 
-	  private final MapperBuilderAssistant builderAssistant;
+	  private final MapperGenBuilderAssistant builderAssistant;
 	  private final XNode context;
 	  private final String requiredDatabaseId;
 
-	  public XMLGenStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode context) {
+	  public XMLGenStatementBuilder(Configuration configuration, MapperGenBuilderAssistant builderAssistant, XNode context) {
 	    this(configuration, builderAssistant, context, null);
 	  }
 
-	  public XMLGenStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode context, String databaseId) {
+	  public XMLGenStatementBuilder(Configuration configuration, MapperGenBuilderAssistant builderAssistant, XNode context, String databaseId) {
 	    super(configuration);
 	    this.builderAssistant = builderAssistant;
 	    this.context = context;
@@ -85,6 +85,7 @@ public class XMLGenStatementBuilder extends BaseBuilder {
 	        0, 0, null, parameterTypeClass, null, resultTypeClass,
 	        null, false, false, false, 
 	        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
+	    builderAssistant.addElement(id);
 	  }
 
 	  private void processSelectKeyNodes(String id, Class<?> parameterTypeClass, LanguageDriver langDriver) {

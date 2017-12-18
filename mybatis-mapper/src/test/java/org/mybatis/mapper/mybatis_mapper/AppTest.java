@@ -11,7 +11,7 @@ import org.mybatis.mapper.xml.XMLGenConfigBuilder;
 public class AppTest 
 {
 	
-    @Test	
+    //@Test	
  	public void config(){
     	try(InputStream is = AppTest.class.getResourceAsStream("mybatis-config.xml");) {
     		XMLGenConfigBuilder config = new XMLGenConfigBuilder(is);
@@ -21,4 +21,8 @@ public class AppTest
 		}
     	
 	}
+ 	
+ 	public void genJavaBean(){
+ 		
+ 	}
 }
