@@ -5,13 +5,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.Interface;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
 import org.mybatis.generator.api.dom.java.Method;
+import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.codegen.Table;
 
 public class SelectMethodGenBuilder extends AbstractJavaMapperMethodGenBuilder {
@@ -57,11 +60,23 @@ public class SelectMethodGenBuilder extends AbstractJavaMapperMethodGenBuilder {
 		}else if(Object.class.getName().equals(resultmap.getType().getName())){
 			FullyQualifiedJavaType listType = new FullyQualifiedJavaType(introspectedTable.className());
 			method.setReturnType(listType);
+			paramterTypes(importedTypes,method);
 		}else{
 			FullyQualifiedJavaType listType = new FullyQualifiedJavaType(resultmap.getType().getSimpleName());
 			method.setReturnType(listType);
 		}
 		
+	}
+	
+	private void paramterTypes(Set<FullyQualifiedJavaType> importedTypes,Method method){
+		List<ParameterMapping> params = mst.getParameterMap().getParameterMappings();
+		if(params!=null&&params.size()>0){
+			importedTypes.add(new FullyQualifiedJavaType(Param.class.getName()));
+			params.forEach(param->{
+				FullyQualifiedJavaType type = new FullyQualifiedJavaType(param.getJavaType().getSimpleName());
+				method.addParameter(new Parameter(type, param.getProperty(),String.format("@Param(\"%s\")", param.getProperty())));
+			});
+		}
 	}
 
 }

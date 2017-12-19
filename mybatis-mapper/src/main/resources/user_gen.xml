@@ -2,9 +2,9 @@
 <!DOCTYPE mapper  
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="com.mybatis.mapper.UserMapper" tableName="user">  
+<mapper namespace="com.mybatis.mapper.UserMapper" tableName="user" bean="">  
     
     
-    <select id="findById" colums="id" result="object" where="user_name" noif="id" param="user_name"/>  
+    <select id="findById" colums="id,user_name" result="object"  noif="id" param="id"/>  
      
 </mapper>

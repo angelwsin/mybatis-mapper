@@ -57,6 +57,7 @@ public class XMLGenStatementBuilder extends BaseBuilder {
         	//对象
         	parameterType = null;
         }
+        
 	    Class<?> parameterTypeClass = resolveClass(parameterType);
 	    String result = context.getStringAttribute("result");
 	    StatementType statementType = StatementType.valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));
@@ -87,9 +88,14 @@ public class XMLGenStatementBuilder extends BaseBuilder {
 	          configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
 	          ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
 	    }
-	    builderAssistant.addElement(id,parameterMap,resultTypeClass);
+	    if(Objects.nonNull(parameterMap)&&!"".equals(parameterMap)){
+        	//对象
+	    	builderAssistant.addElement(id,parameterMap,resultTypeClass);
+        	parameterMap = id;
+        }
+	   
 	    builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
-	        0, 0, id, parameterTypeClass, null, resultTypeClass,
+	        0, 0, parameterMap, parameterTypeClass, null, resultTypeClass,
 	        null, false, false, false, 
 	        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
 	   
