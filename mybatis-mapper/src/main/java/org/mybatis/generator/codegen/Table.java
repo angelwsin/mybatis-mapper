@@ -77,6 +77,20 @@ public class Table {
 	}
 
 
+	public String getMyBatisJavaMapperType() {
+		return className()+"Mapper";
+	}
+	
+	public String  className(){
+		String[] c =  runtimeTableName.split("_");
+		StringBuilder b = new StringBuilder();
+		for(int i=0;i<c.length;i++){
+			b.append(c[i].substring(0, 1).toUpperCase()).append(c[i].substring(1));
+		}
+		return b.toString();
+	 }
+
+
 	
 	
     

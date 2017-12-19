@@ -8,18 +8,23 @@ import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.codegen.Table;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
+import org.mybatis.mapper.config.Const;
 
 public class SelectElementGenBuilder extends AbstractXmlElementGenBuilder{
+	
+	
 
 	
-	public SelectElementGenBuilder(Configuration configuration, String id) {
-		super(configuration, id);
+	public SelectElementGenBuilder(Configuration configuration, String id,Table introspectedTable) {
+		super(configuration, id,introspectedTable);
+		buildes.add(new WhereElementGenBuilder(configuration, id,introspectedTable));
 	}
 	
 	@Override
-	public XmlElement element(XmlElement parentElement) {
-		List<IntrospectedColumn> columns = introspectedTable.getColumns();
+	public void element(XmlElement parentElement) {
+		List<IntrospectedColumn> columns = getFilterColums(Const.COLUMS);
 		XmlElement answer = new XmlElement("select"); //$NON-NLS-1$
 
         answer.addAttribute(new Attribute(
@@ -53,7 +58,11 @@ public class SelectElementGenBuilder extends AbstractXmlElementGenBuilder{
         sb.append("from "); //$NON-NLS-1$
         sb.append(introspectedTable.getRuntimeTableName());
         answer.addElement(new TextElement(sb.toString()));
-        return answer;
+        parentElement.addElement(answer);
+        
+        for(AbstractXmlElementGenBuilder b : buildes){
+        	b.element(answer);
+        }
 	}
 
 }

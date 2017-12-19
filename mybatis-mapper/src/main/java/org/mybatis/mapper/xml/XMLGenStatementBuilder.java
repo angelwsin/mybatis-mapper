@@ -1,8 +1,10 @@
 package org.mybatis.mapper.xml;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.xml.XMLIncludeTransformer;
@@ -11,6 +13,8 @@ import org.apache.ibatis.executor.keygen.KeyGenerator;
 import org.apache.ibatis.executor.keygen.NoKeyGenerator;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
@@ -18,7 +22,8 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
-import org.mybatis.mapper.config.Const;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandler;
 
 public class XMLGenStatementBuilder extends BaseBuilder {
 
@@ -44,12 +49,13 @@ public class XMLGenStatementBuilder extends BaseBuilder {
 	    if (!databaseIdMatchesCurrent(id, databaseId, this.requiredDatabaseId)) {
 	      return;
 	    }
-
-	    String parameterType = context.getStringAttribute("param");
+	    String parameterMap = context.getStringAttribute("param");
+	    String parameterType = context.getStringAttribute("paramType");
 	    String lang = "GenScript";
 	    LanguageDriver langDriver = getLanguageDriver(lang);
-        if("object".equalsIgnoreCase(parameterType)){
+        if(Objects.isNull(parameterType)||"".equals(parameterType)){
         	//对象
+        	parameterType = null;
         }
 	    Class<?> parameterTypeClass = resolveClass(parameterType);
 	    String result = context.getStringAttribute("result");
@@ -81,12 +87,15 @@ public class XMLGenStatementBuilder extends BaseBuilder {
 	          configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
 	          ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
 	    }
+	    builderAssistant.addElement(id,parameterMap,resultTypeClass);
 	    builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
-	        0, 0, null, parameterTypeClass, null, resultTypeClass,
+	        0, 0, id, parameterTypeClass, null, resultTypeClass,
 	        null, false, false, false, 
 	        keyGenerator, keyProperty, keyColumn, databaseId, langDriver, resultSets);
-	    builderAssistant.addElement(id);
+	   
 	  }
+	  
+	 
 
 	  private void processSelectKeyNodes(String id, Class<?> parameterTypeClass, LanguageDriver langDriver) {
 	    List<XNode> selectKeyNodes = context.evalNodes("selectKey");

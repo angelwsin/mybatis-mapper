@@ -88,6 +88,7 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 		  String where = context.getStringAttribute("where");
 		  String colums = context.getStringAttribute("colums");
 		  String orderBy = context.getStringAttribute("orderBy");
+		  String noif = context.getStringAttribute("noif");
 		  if(Objects.nonNull(where)&&!where.equals("")){
 			  contents.add(new WhereGenSqlNode(where));
 		  }
@@ -96,6 +97,9 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 		  }
 		  if(Objects.nonNull(orderBy)&&!orderBy.equals("")){
 			  contents.add(new TextGenSqlNode(orderBy));
+		  }
+		  if(Objects.nonNull(noif)&&!noif.equals("")){
+			  contents.add(new NoIfGenSqlNode(noif));
 		  }
 		   return contents;
 		  }

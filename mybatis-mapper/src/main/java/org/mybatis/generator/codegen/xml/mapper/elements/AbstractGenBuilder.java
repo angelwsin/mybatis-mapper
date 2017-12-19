@@ -7,9 +7,11 @@ import org.mybatis.generator.codegen.Table;
 public abstract class AbstractGenBuilder extends BaseBuilder{
 	
 	protected Table introspectedTable;
+	
 
-	public AbstractGenBuilder(Configuration configuration) {
+	public AbstractGenBuilder(Configuration configuration,Table introspectedTable) {
 		super(configuration);
+		this.introspectedTable = introspectedTable;
 	}
 
 	public Table getIntrospectedTable() {

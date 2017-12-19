@@ -2,16 +2,17 @@ package org.mybatis.generator.codegen.xml.mapper.elements;
 
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.codegen.Table;
 
 public class SqlElementGenBuilder extends AbstractXmlElementGenBuilder{
 
 
-	public SqlElementGenBuilder(Configuration configuration, String id) {
-		super(configuration, id);
+	public SqlElementGenBuilder(Configuration configuration, String id,Table introspectedTable) {
+		super(configuration, id,introspectedTable);
 	}
 
 	@Override
-	public XmlElement element(XmlElement parentElement){
+	public void element(XmlElement parentElement){
 		 XmlElement answer = new XmlElement("sql"); //$NON-NLS-1$
 
 	        /*answer.addAttribute(new Attribute("id", //$NON-NLS-1$
@@ -45,7 +46,6 @@ public class SqlElementGenBuilder extends AbstractXmlElementGenBuilder{
 	            parentElement.addElement(answer);
 	        }*/
 		 
-		 return null;
 		
 	}
 

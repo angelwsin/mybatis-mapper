@@ -5,15 +5,15 @@ import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.Document;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.codegen.Table;
 import org.mybatis.generator.codegen.XmlConstants;
 import org.mybatis.generator.codegen.xml.mapper.elements.AbstractXmlGenBuilder;
 import org.mybatis.generator.codegen.xml.mapper.elements.SelectElementGenBuilder;
-import org.mybatis.generator.codegen.xml.mapper.elements.WhereElementGenBuilder;
 
 public class XMLMapperGenBuilder extends AbstractXmlGenBuilder{
 
-	public XMLMapperGenBuilder(Configuration configuration) {
-		super(configuration);
+	public XMLMapperGenBuilder(Configuration configuration,Table introspectedTable) {
+		super(configuration,introspectedTable);
 	}
 
 	@Override
@@ -54,12 +54,9 @@ public class XMLMapperGenBuilder extends AbstractXmlGenBuilder{
 	
 	
 	protected void  select(Configuration configuration, String id,XmlElement parentElement){
-		SelectElementGenBuilder selectElementGenBuilder = new SelectElementGenBuilder(configuration, id);
-		selectElementGenBuilder.setIntrospectedTable(introspectedTable);
-		XmlElement select  = selectElementGenBuilder.element(parentElement);
-		WhereElementGenBuilder whereElement = new WhereElementGenBuilder(configuration, id);
-		whereElement.setIntrospectedTable(introspectedTable);
-		whereElement.element(select);
+		SelectElementGenBuilder selectElementGenBuilder = new SelectElementGenBuilder(configuration, id,introspectedTable);
+		selectElementGenBuilder.element(parentElement);
+		
 	}
 
 }

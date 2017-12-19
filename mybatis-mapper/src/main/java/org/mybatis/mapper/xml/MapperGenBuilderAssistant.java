@@ -1,12 +1,36 @@
 package org.mybatis.mapper.xml;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandler;
+import org.mybatis.generator.api.IntrospectedColumn;
+import org.mybatis.generator.api.JavaTypeResolver;
+import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
+import org.mybatis.generator.codegen.Table;
+import org.mybatis.generator.codegen.mapper.JavaMapperGenBuilder;
+import org.mybatis.generator.codegen.xml.mapper.XMLMapperGenBuilder;
+import org.mybatis.generator.internal.types.JavaTypeResolverDefaultImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 
@@ -17,11 +41,14 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 	private String currentCatalog;
 
 	private String currentSchema;
+	JavaTypeResolver javaTypeResolver;
 	
 	private List<String> ids = new  ArrayList<>();
 
 	public MapperGenBuilderAssistant(Configuration configuration, String resource) {
 		super(configuration, resource);
+		javaTypeResolver = new JavaTypeResolverDefaultImpl();
+		
 
 	}
 
@@ -49,11 +76,15 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 		this.currentSchema = currentSchema;
 	}
 
-	
-
-
-	public void addElement(String id) {
+	public void addElement(String id,String list,Class<?> parameterClass) {
 		ids.add(applyCurrentNamespace(id, false));
+		if(Objects.nonNull(list)&&!list.equals("")){
+			try {
+				parameterMapElement(Arrays.asList(list.split(",")),parameterClass,id,colums());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 
 	}
@@ -62,6 +93,131 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 		return ids;
 	}
 	
+	
+	private void writeFile(File file, String content, String fileEncoding) throws IOException {
+        FileOutputStream fos = new FileOutputStream(file, false);
+        OutputStreamWriter osw;
+        if (fileEncoding == null) {
+            osw = new OutputStreamWriter(fos);
+        } else {
+            osw = new OutputStreamWriter(fos, fileEncoding);
+        }
+        
+        BufferedWriter bw = new BufferedWriter(osw);
+        bw.write(content);
+        bw.close();
+    }
+	
+	  public void buildMapper(){
+		  Table table = new Table( getCurrentTableName(),  colums());
+		  XMLMapperGenBuilder xmlMapperBuilder = new XMLMapperGenBuilder(configuration,table);
+		  xmlMapperBuilder.setIds(getIds());
+		  table.setRuntimeTableName(currentTableName);
+		  table.setMyBatisSqlMapNamespace(getCurrentNamespace());
+		  xmlMapperBuilder.setIntrospectedTable(table);
+		  String project = configuration.getVariables().getProperty("project");
+		  String sqlMap = configuration.getVariables().getProperty("sqlMap");
+		  File dir = new File(project+sqlMap);
+		  if(!dir.exists()) dir.mkdirs();
+		  File file = new File(dir, getCurrentTableName()+"Mapper.xml");
+		  try {
+			writeFile(file, xmlMapperBuilder.getDocument().getFormattedContent(), "utf-8");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 // System.out.println(xmlMapperBuilder.getDocument().getFormattedContent());
+		  
+		  JavaMapperGenBuilder javaMapper = new JavaMapperGenBuilder(configuration, ids,table);
+		  javaMapper.getCompilationUnits();
+	  }
+	  
+	  
+	private List<IntrospectedColumn> colums() {
+		Configuration conf = getConfiguration();
+		DataSource dataSource = conf.getEnvironment().getDataSource();
+		List<IntrospectedColumn> answer = new ArrayList<>();
+		try (Connection con = dataSource.getConnection();) {
+			ResultSet rs = con.getMetaData().getColumns(null, null, getCurrentTableName(), "%"); //$NON-NLS-1$
+
+			boolean supportsIsAutoIncrement = false;
+			boolean supportsIsGeneratedColumn = false;
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int colCount = rsmd.getColumnCount();
+			for (int i = 1; i <= colCount; i++) {
+				if ("IS_AUTOINCREMENT".equals(rsmd.getColumnName(i))) { //$NON-NLS-1$
+					supportsIsAutoIncrement = true;
+				}
+				if ("IS_GENERATEDCOLUMN".equals(rsmd.getColumnName(i))) { //$NON-NLS-1$
+					supportsIsGeneratedColumn = true;
+				}
+			}
+
+			while (rs.next()) {
+				IntrospectedColumn introspectedColumn = new IntrospectedColumn();
+
+				// introspectedColumn.setTableAlias(tc.getAlias());
+				introspectedColumn.setJdbcType(rs.getInt("DATA_TYPE")); //$NON-NLS-1$
+				introspectedColumn.setLength(rs.getInt("COLUMN_SIZE")); //$NON-NLS-1$
+				introspectedColumn.setActualColumnName(rs.getString("COLUMN_NAME")); //$NON-NLS-1$
+				introspectedColumn.setNullable(rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable); //$NON-NLS-1$
+				introspectedColumn.setScale(rs.getInt("DECIMAL_DIGITS")); //$NON-NLS-1$
+				introspectedColumn.setRemarks(rs.getString("REMARKS")); //$NON-NLS-1$
+				introspectedColumn.setDefaultValue(rs.getString("COLUMN_DEF")); //$NON-NLS-1$
+				if (supportsIsAutoIncrement) {
+					introspectedColumn.setAutoIncrement("YES".equals(rs.getString("IS_AUTOINCREMENT"))); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				if (supportsIsGeneratedColumn) {
+					introspectedColumn.setGeneratedColumn("YES".equals(rs.getString("IS_GENERATEDCOLUMN"))); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				javabean(introspectedColumn);
+				answer.add(introspectedColumn);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return answer;
+	}
+
+	 private void  javabean(IntrospectedColumn introspectedColumn){
+		 introspectedColumn.setJavaProperty(s(introspectedColumn.getActualColumnName()));
+		 introspectedColumn.setFullyQualifiedJavaType(javaTypeResolver.calculateJavaType(introspectedColumn));
+		 
+	 } 
+	 
+	 private String  s(String colums){
+		String[] c =  colums.split("_");
+		StringBuilder b = new StringBuilder(c[0]);
+		for(int i=1;i<c.length;i++){
+			b.append(c[i].substring(0, 1).toUpperCase()).append(c[i].substring(1));
+		}
+		return b.toString();
+	 }
+	 
+	 
+	 @SuppressWarnings("unchecked")
+	private void parameterMapElement(List<String> list,Class<?> parameterClass,String id,List<IntrospectedColumn> columns) throws Exception {
+		 List<ParameterMapping> parameterMappings = new ArrayList<ParameterMapping>();
+		 for(IntrospectedColumn column: columns){
+			 for(String c : list){
+				 if(column.getActualColumnName().equals(c)||column.getJavaProperty().equals(c)){
+					    String property = column.getJavaProperty();
+				        String javaType = column.getFullyQualifiedJavaType().getShortName();
+				        int jdbcType = column.getJdbcType();
+				        Class<?> javaTypeClass = resolveClass(javaType);
+				        JdbcType jdbcTypeEnum = JdbcType.forCode(jdbcType);
+				        Class<? extends TypeHandler<?>> typeHandlerClass = (Class<? extends TypeHandler<?>>) resolveClass(null);
+				        ParameterMapping parameterMapping = buildParameterMapping(parameterClass, property, javaTypeClass, jdbcTypeEnum, null, null, typeHandlerClass, null);
+				        parameterMappings.add(parameterMapping);
+				        addParameterMap(id, parameterClass, parameterMappings);
+				 } 
+			 }
+		 }
+		 
+	  }
 	
 
 
