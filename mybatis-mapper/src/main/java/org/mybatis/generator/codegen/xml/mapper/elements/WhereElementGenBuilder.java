@@ -1,9 +1,10 @@
 package org.mybatis.generator.codegen.xml.mapper.elements;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
@@ -18,14 +19,15 @@ public class WhereElementGenBuilder extends AbstractXmlElementGenBuilder{
 
 	
 
-	public WhereElementGenBuilder(Configuration configuration, String id,Table introspectedTable) {
-		super(configuration, id,introspectedTable);
+	
+	public WhereElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
+		super(configuration, introspectedTable, mst);
 	}
 
 	@Override
 	public void element(XmlElement parentElement) {
 		List<IntrospectedColumn> columns = getFilterColums(Const.NO_IF);
-		XmlElement answer = new XmlElement("where"); 
+		XmlElement answer = null;
 		StringBuilder sb = new StringBuilder();
 		boolean noifFlag = false;
         if(columns.size()>0){
@@ -40,12 +42,15 @@ public class WhereElementGenBuilder extends AbstractXmlElementGenBuilder{
   			  sb.append("="); 
   			  sb.append(MyBatisFormattingUtilities
   	                    .getParameterClause(introspectedColumn));
-  			  if(noifIt.hasNext())sb.append("and");
+  			  if(noifIt.hasNext())sb.append(" and ");
   			  answer.addElement(new TextElement(sb.toString()));
   		  }
   		}
         
 		columns = getFilterColums(Const.WHERE_COLUMS);
+		if(Objects.isNull(columns)||columns.size()<=0)
+			return ;
+		answer = new XmlElement("where"); 
 		
 		int sum = 0;
 		for (IntrospectedColumn introspectedColumn : columns) {
@@ -65,7 +70,7 @@ public class WhereElementGenBuilder extends AbstractXmlElementGenBuilder{
             sb.append(" = "); //$NON-NLS-1$
             sb.append(MyBatisFormattingUtilities
                     .getParameterClause(introspectedColumn));
-            if(sum!=columns.size())sb.append("and");
+            if(sum!=columns.size())sb.append(" and ");
             ifElement.addElement(new TextElement(sb.toString()));
             answer.addElement(ifElement);
            

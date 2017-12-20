@@ -76,24 +76,29 @@ public class XMLGenMapperBuilder extends BaseBuilder {
 	  }
 
 	  private void configurationElement(XNode context) {
-	    try {
-	      String namespace = context.getStringAttribute("namespace");
-	      String tableName = context.getStringAttribute("tableName");
-	      if (Objects.isNull(namespace) || namespace.equals("")) {
-	        throw new BuilderException("Mapper's namespace cannot be empty");
-	      }
-	      if (Objects.isNull(tableName) || tableName.equals("")) {
-		        throw new BuilderException("Mapper's tableName cannot be empty");
-		    }
-	      
-	      builderAssistant.setCurrentNamespace(namespace);
-	      builderAssistant.setCurrentTableName(tableName);
-	      sqlElement(context.evalNodes("/mapper/sql"));
-	      buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
-	      builderAssistant.buildMapper();
-	    } catch (Exception e) {
-	      throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);
-	    }
+		try {
+			String namespace = context.getStringAttribute("namespace");
+			String tableName = context.getStringAttribute("tableName");
+			String bean = context.getStringAttribute("bean");
+			if (Objects.isNull(namespace) || namespace.equals("")) {
+				throw new BuilderException("Mapper's namespace cannot be empty");
+			}
+			if (Objects.isNull(tableName) || tableName.equals("")) {
+				throw new BuilderException("Mapper's tableName cannot be empty");
+			}
+			if (Objects.isNull(bean) || bean.equals("")) {
+				throw new BuilderException("Mapper's bean cannot be empty");
+			}
+
+			builderAssistant.setCurrentNamespace(namespace);
+			builderAssistant.setCurrentTableName(tableName);
+			builderAssistant.setCurrentBean(bean);
+			sqlElement(context.evalNodes("/mapper/sql"));
+			buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
+			builderAssistant.buildMapper();
+		} catch (Exception e) {
+			throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);
+		}
 	  }
 
 	  private void buildStatementFromContext(List<XNode> list) {

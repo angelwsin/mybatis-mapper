@@ -2,8 +2,10 @@ package org.mybatis.mapper.mybatis_mapper;
 
 import java.io.InputStream;
 
+import org.apache.ibatis.session.SqlSessionManager;
 import org.junit.Test;
-import org.mybatis.mapper.xml.XMLGenConfigBuilder;
+
+import com.mybatis.mapper.UserMapper;
 
 /**
  * Unit test for simple App.
@@ -11,11 +13,11 @@ import org.mybatis.mapper.xml.XMLGenConfigBuilder;
 public class AppTest 
 {
 	
-    //@Test	
+    @Test
  	public void config(){
     	try(InputStream is = AppTest.class.getResourceAsStream("mybatis-config.xml");) {
-    		XMLGenConfigBuilder config = new XMLGenConfigBuilder(is);
-    		config.getConfiguration().getEnvironment().getDataSource();
+    		SqlSessionManager mange = SqlSessionManager.newInstance(is);
+    		mange.getMapper(UserMapper.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

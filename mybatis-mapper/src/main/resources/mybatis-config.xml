@@ -22,8 +22,8 @@
        </environment>  
     </environments>  
     <mappers>  
-       <mapper resource="user_gen.xml"/>
-      <!--  <package name="com.tiantian.mybatis.mapperinterface"/>   -->
+     <mapper resource="user_gen.xml"/>
+      <!-- <mapper resource="sqlMap/userMapper.xml"/>  -->
     </mappers> 
  
 </configuration>

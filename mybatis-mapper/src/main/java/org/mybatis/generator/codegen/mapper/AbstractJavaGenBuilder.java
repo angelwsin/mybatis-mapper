@@ -2,8 +2,7 @@ package org.mybatis.generator.codegen.mapper;
 
 import static org.mybatis.generator.internal.util.JavaBeansUtil.getGetterMethodName;
 
-import java.util.List;
-
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.java.CompilationUnit;
 import org.mybatis.generator.api.dom.java.Field;
@@ -17,12 +16,12 @@ public abstract class AbstractJavaGenBuilder extends  AbstractGenBuilder{
 	
 	protected String namespace;
 
-	public AbstractJavaGenBuilder(Configuration configuration,Table introspectedTable) {
-		super(configuration,introspectedTable);
+	public AbstractJavaGenBuilder(Configuration configuration,Table introspectedTable,MappedStatement  mst) {
+		super(configuration,mst,introspectedTable);
 	}
 	
 	
-	public abstract List<CompilationUnit> getCompilationUnits();
+	public abstract CompilationUnit getCompilationUnits();
 
     public static Method getGetter(Field field) {
         Method method = new Method();

@@ -12,21 +12,24 @@ import org.mybatis.generator.codegen.Table;
 
 public class JavaMapperGenBuilder extends AbstractJavaGenBuilder{
 	
+	
 	protected List<String>      ids;
-
-	public JavaMapperGenBuilder(Configuration configuration,List<String> ids,Table introspectedTable) {
-		super(configuration,introspectedTable);
+	
+	
+	public JavaMapperGenBuilder(Configuration configuration,List<String> ids, Table introspectedTable) {
+		super(configuration, introspectedTable, null);
 		this.ids = ids;
 	}
-	
+
 	@Override
-    public List<CompilationUnit> getCompilationUnits() {
+    public CompilationUnit getCompilationUnits() {
        // CommentGenerator commentGenerator = context.getCommentGenerator();
 
         FullyQualifiedJavaType type = new FullyQualifiedJavaType(
-                introspectedTable.getMyBatisJavaMapperType());
+                introspectedTable.getMyBatisSqlMapNamespace());
         Interface interfaze = new Interface(type);
         interfaze.setVisibility(JavaVisibility.PUBLIC);
+        
         //commentGenerator.addJavaFileComment(interfaze);
 
         /*String rootInterface = introspectedTable
@@ -52,6 +55,10 @@ public class JavaMapperGenBuilder extends AbstractJavaGenBuilder{
 				select(getConfiguration(), mst,interfaze);
 			   }
 			   break;
+			case UPDATE:{
+				update(getConfiguration(), mst,interfaze);
+			   }
+			   break;
 
 			default:
 				break;
@@ -59,13 +66,18 @@ public class JavaMapperGenBuilder extends AbstractJavaGenBuilder{
         	
         }
 
-        return null;
+        return interfaze;
     }
+
+	private void update(Configuration configuration, MappedStatement mst, Interface interfaze) {
+		UpdateMethodGenBuilder update = new UpdateMethodGenBuilder(configuration, mst, introspectedTable);
+		update.addInterfaceElements(interfaze);
+		
+	}
 
 	private void select(Configuration configuration, MappedStatement mst, Interface interfaze) {
 		SelectMethodGenBuilder  select = new SelectMethodGenBuilder(configuration, mst,introspectedTable);
 		select.addInterfaceElements(interfaze);
-		System.out.println(interfaze.getFormattedContent());
 	}
 
 

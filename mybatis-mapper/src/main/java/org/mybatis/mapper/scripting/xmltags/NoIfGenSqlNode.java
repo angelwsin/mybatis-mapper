@@ -19,7 +19,7 @@ public class NoIfGenSqlNode implements SqlNode{
 	@Override
 	public boolean apply(DynamicContext context) {
 		if(Objects.nonNull(noif)){
-			context.appendSql(String.format("%s:%s", Const.NO_IF,noif));
+			context.appendSql(String.format("%s:%s$", Const.NO_IF,noif));
 		}
 		return false;
 	}

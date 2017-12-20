@@ -1,20 +1,18 @@
 package org.mybatis.mapper.xml;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 import org.apache.ibatis.builder.BaseBuilder;
+import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.xml.XMLIncludeTransformer;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
 import org.apache.ibatis.executor.keygen.NoKeyGenerator;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
@@ -22,8 +20,6 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandler;
 
 public class XMLGenStatementBuilder extends BaseBuilder {
 
@@ -88,12 +84,16 @@ public class XMLGenStatementBuilder extends BaseBuilder {
 	          configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType))
 	          ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
 	    }
+	    builderAssistant.addElement(id,parameterMap,resultTypeClass);
 	    if(Objects.nonNull(parameterMap)&&!"".equals(parameterMap)){
         	//对象
-	    	builderAssistant.addElement(id,parameterMap,resultTypeClass);
+	    	if(Objects.nonNull(parameterType)){
+	    		throw new BuilderException(
+						"param&&paramType 不能同时存在.");
+	    	}
+	    	
         	parameterMap = id;
         }
-	   
 	    builderAssistant.addMappedStatement(id, sqlSource, statementType, sqlCommandType,
 	        0, 0, parameterMap, parameterTypeClass, null, resultTypeClass,
 	        null, false, false, false, 

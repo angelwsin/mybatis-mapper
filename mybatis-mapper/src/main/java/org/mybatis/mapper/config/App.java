@@ -24,11 +24,12 @@ public class App
 
     	</mapper>*/
        //DriverManager.getConnection(url, user, password)
-    	
     	try(InputStream is = App.class.getResourceAsStream("/mybatis-config.xml");) {
-    		System.out.println(is==null);
     		XMLGenConfigBuilder config = new XMLGenConfigBuilder(is);
     		config.parse();
+    		/*SqlSessionManager mange = SqlSessionManager.newInstance(is);
+    		UserMapper userMapper = mange.getMapper(UserMapper.class);
+    		userMapper.findById(2);*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

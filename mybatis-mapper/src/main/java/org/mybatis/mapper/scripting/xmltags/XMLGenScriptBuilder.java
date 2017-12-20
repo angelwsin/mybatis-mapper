@@ -87,16 +87,20 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 		  List<SqlNode> contents = new ArrayList<SqlNode>();
 		  String where = context.getStringAttribute("where");
 		  String colums = context.getStringAttribute("colums");
-		  String orderBy = context.getStringAttribute("orderBy");
+		  String append = context.getStringAttribute("append");
 		  String noif = context.getStringAttribute("noif");
 		  if(Objects.nonNull(where)&&!where.equals("")){
 			  contents.add(new WhereGenSqlNode(where));
+		  }else{
+			  contents.add(new WhereGenSqlNode("all"));
 		  }
 		  if(Objects.nonNull(colums)&&!colums.equals("")){
 			  contents.add(new ColumsGenSqlNode(colums));
+		  }else{
+			  contents.add(new ColumsGenSqlNode("all"));
 		  }
-		  if(Objects.nonNull(orderBy)&&!orderBy.equals("")){
-			  contents.add(new TextGenSqlNode(orderBy));
+		  if(Objects.nonNull(append)&&!append.equals("")){
+			  contents.add(new TextGenSqlNode(append));
 		  }
 		  if(Objects.nonNull(noif)&&!noif.equals("")){
 			  contents.add(new NoIfGenSqlNode(noif));

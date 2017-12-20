@@ -25,18 +25,75 @@ public class Table {
     private String runtimeTableName;
 
     /** The domain object name. */
-    private String domainObjectName;
+    private String beanName;
+    
+    private String mapperInterfaceName;
     
     /** The domain object sub package. */
-    private String domainObjectSubPackage;
+    private String beanPackage;
+    
+    private String mapperPackage;
 
     /** The alias. */
     private String alias;
     
     private String myBatisSqlMapNamespace;
     
+    private String beanNamespace;
     
-    private List<IntrospectedColumn> columns;
+    
+    
+    
+    public String getBeanNamespace() {
+		return beanNamespace;
+	}
+
+
+	public void setBeanNamespace(String beanNamespace) {
+		this.beanNamespace = beanNamespace;
+	}
+
+
+	public String getBeanPackage() {
+		return beanPackage;
+	}
+
+
+	public void setBeanPackage(String beanPackage) {
+		this.beanPackage = beanPackage;
+	}
+
+
+	public String getMapperPackage() {
+		return mapperPackage;
+	}
+
+
+	public void setMapperPackage(String mapperPackage) {
+		this.mapperPackage = mapperPackage;
+	}
+
+
+	public String getBeanName() {
+		return beanName;
+	}
+
+
+	public void setBeanName(String beanName) {
+		this.beanName = beanName;
+	}
+
+
+	public String getMapperInterfaceName() {
+		return mapperInterfaceName;
+	}
+
+
+	public void setMapperInterfaceName(String mapperInterfaceName) {
+		this.mapperInterfaceName = mapperInterfaceName;
+	}
+
+	private List<IntrospectedColumn> columns;
 
 
 	public Table( String runtimeTableName,

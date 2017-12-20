@@ -2,6 +2,7 @@ package org.mybatis.generator.codegen.xml.mapper.elements;
 
 import java.util.List;
 
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.xml.Document;
 import org.mybatis.generator.codegen.Table;
@@ -10,8 +11,8 @@ public abstract class AbstractXmlGenBuilder extends AbstractGenBuilder{
 
 	protected List<String>      ids;
 	
-	public AbstractXmlGenBuilder(Configuration configuration,Table introspectedTable) {
-		super(configuration,introspectedTable);
+	public AbstractXmlGenBuilder(Configuration configuration,Table introspectedTable,MappedStatement  mst) {
+		super(configuration,mst,introspectedTable);
 	}
 	
 	public abstract Document getDocument();

@@ -2,10 +2,8 @@ package org.mybatis.generator.codegen.xml.mapper.elements;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.xml.Attribute;
@@ -13,19 +11,14 @@ import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.Table;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
+import org.mybatis.generator.codegen.util.MyBatisFormattingUtilities;
 import org.mybatis.mapper.config.Const;
 
-public class SelectElementGenBuilder extends AbstractXmlElementGenBuilder{
-	
-	
+public class UpdateElementGenBuilder extends AbstractXmlElementGenBuilder{
 
-	
-
-	
-	public SelectElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
+	public UpdateElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
 		super(configuration, introspectedTable, mst);
 		buildes.add(new WhereElementGenBuilder(configuration,introspectedTable, mst));
-		buildes.add(new AppendElementGenBuilder(configuration, introspectedTable, mst));
 	}
 
 	@Override
@@ -35,26 +28,18 @@ public class SelectElementGenBuilder extends AbstractXmlElementGenBuilder{
 
         answer.addAttribute(new Attribute(
                 "id", getId())); //$NON-NLS-1$
-        ResultMap resultmap = mst.getResultMaps().get(0);
-		if(List.class.isAssignableFrom(resultmap.getType())){
-			answer.addAttribute(new Attribute("resultType", List.class.getSimpleName()));
-		}else if(Map.class.isAssignableFrom(resultmap.getType())){
-			answer.addAttribute(new Attribute("resultType", Map.class.getSimpleName()));
-		}else if(Object.class.getName().equals(resultmap.getType().getName())){
-			answer.addAttribute(new Attribute("resultType", introspectedTable.getBeanNamespace()));
-		}
         
-
         //context.getCommentGenerator().addComment(answer);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select "); //$NON-NLS-1$
+        sb.append("update set "); //$NON-NLS-1$
         Iterator<IntrospectedColumn> iter = columns
                 .iterator();
         while (iter.hasNext()) {
         	IntrospectedColumn introspectedColumn = iter.next();
             sb.append(MyBatis3FormattingUtilities.getSelectListPhrase(introspectedColumn));
-            sb.append(" as ").append(introspectedColumn.getJavaProperty(null));
+            sb.append(" = ").append(MyBatisFormattingUtilities
+	                    .getParameterClause(introspectedColumn));
             if (iter.hasNext()) {
                 sb.append(", "); //$NON-NLS-1$
             }
@@ -78,6 +63,9 @@ public class SelectElementGenBuilder extends AbstractXmlElementGenBuilder{
         for(AbstractXmlElementGenBuilder b : buildes){
         	b.element(answer);
         }
+		
 	}
+	
+	
 
 }

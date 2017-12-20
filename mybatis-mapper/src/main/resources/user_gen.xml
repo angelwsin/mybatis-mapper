@@ -2,9 +2,13 @@
 <!DOCTYPE mapper  
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
-<mapper namespace="com.mybatis.mapper.UserMapper" tableName="user" bean="">  
+<mapper namespace="com.mybatis.mapper.UserMapper" tableName="user" bean="com.mybatis.model.User">  
     
     
-    <select id="findById" colums="id,user_name" result="object"  noif="id" param="id"/>  
+    <select id="findById" colums="id,user_name" result="object"  noif="id" param="id"/>
+    
+    <select id="findList" where="all" result="List"   paramType="Map" append="order by id desc "/>  
+    
+    <update id="update"  noif="id" param="id"/>  
      
 </mapper>

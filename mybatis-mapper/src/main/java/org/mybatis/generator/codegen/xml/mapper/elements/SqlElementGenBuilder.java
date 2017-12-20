@@ -1,5 +1,6 @@
 package org.mybatis.generator.codegen.xml.mapper.elements;
 
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.Table;
@@ -7,8 +8,10 @@ import org.mybatis.generator.codegen.Table;
 public class SqlElementGenBuilder extends AbstractXmlElementGenBuilder{
 
 
-	public SqlElementGenBuilder(Configuration configuration, String id,Table introspectedTable) {
-		super(configuration, id,introspectedTable);
+	
+
+	public SqlElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
+		super(configuration, introspectedTable, mst);
 	}
 
 	@Override

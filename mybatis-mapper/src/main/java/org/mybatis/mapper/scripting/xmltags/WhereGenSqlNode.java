@@ -21,7 +21,7 @@ public class WhereGenSqlNode implements SqlNode{
 	@Override
 	public boolean apply(DynamicContext context) {
 		if(Objects.nonNull(whereColums)){
-			context.appendSql(String.format("%s:%s", Const.WHERE_COLUMS,whereColums));
+			context.appendSql(String.format("%s:%s$", Const.WHERE_COLUMS,whereColums));
 		}
 		return false;
 	}
