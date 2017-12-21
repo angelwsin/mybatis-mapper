@@ -1,16 +1,14 @@
 package org.mybatis.generator.codegen.xml.mapper.elements;
 
-import java.util.List;
-
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.Table;
-import org.mybatis.mapper.config.Const;
 
 public class AppendElementGenBuilder extends AbstractXmlElementGenBuilder{
 
+    protected String text;
 
 	public AppendElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
 		super(configuration, introspectedTable, mst);
@@ -18,11 +16,16 @@ public class AppendElementGenBuilder extends AbstractXmlElementGenBuilder{
 
 	@Override
 	public void element(XmlElement parentElement) {
-		List<String> append = getFilterByKey(Const.APPEND);
-		for(String a : append){
-			parentElement.addElement(new TextElement(a.trim()));	
-		}
-		
+		    for(String t :text.split("\n")){
+		    	if(t.matches("\\s*\n*\\s*")) continue ;
+		    	parentElement.addElement(new TextElement(t));
+		    }	
 	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+	
+	
 
 }

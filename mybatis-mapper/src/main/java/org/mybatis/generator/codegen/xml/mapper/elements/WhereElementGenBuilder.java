@@ -1,6 +1,5 @@
 package org.mybatis.generator.codegen.xml.mapper.elements;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,8 +15,8 @@ import org.mybatis.generator.codegen.util.MyBatisFormattingUtilities;
 import org.mybatis.mapper.config.Const;
 
 public class WhereElementGenBuilder extends AbstractXmlElementGenBuilder{
-
-	
+	 
+	 protected String[] wheres;
 
 	
 	public WhereElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
@@ -26,32 +25,19 @@ public class WhereElementGenBuilder extends AbstractXmlElementGenBuilder{
 
 	@Override
 	public void element(XmlElement parentElement) {
-		List<IntrospectedColumn> columns = getFilterColums(Const.NO_IF);
-		XmlElement answer = null;
-		StringBuilder sb = new StringBuilder();
-		boolean noifFlag = false;
-        if(columns.size()>0){
-          noifFlag = true;
-          answer = parentElement;
-          answer.addElement(new TextElement("where"));
-  		  Iterator<IntrospectedColumn> noifIt = columns.iterator();
-  		  while(noifIt.hasNext()){
-  			  IntrospectedColumn introspectedColumn = noifIt.next();
-  			  sb.setLength(0);
-  			  sb.append(introspectedColumn.getJavaProperty());
-  			  sb.append("="); 
-  			  sb.append(MyBatisFormattingUtilities
-  	                    .getParameterClause(introspectedColumn));
-  			  if(noifIt.hasNext())sb.append(" and ");
-  			  answer.addElement(new TextElement(sb.toString()));
-  		  }
-  		}
-        
-		columns = getFilterColums(Const.WHERE_COLUMS);
+		Object obj = Context.get().get(getId()+Const.NO_IF);
+		boolean noifFlag = obj==null?false:(boolean) obj; 
+        //Const.WHERE_COLUMS
+		List<IntrospectedColumn> columns = getFilterColums(wheres);
 		if(Objects.isNull(columns)||columns.size()<=0)
 			return ;
-		answer = new XmlElement("where"); 
+		XmlElement answer = parentElement;
+		if (!noifFlag) {
+		    answer = new XmlElement("where"); 
+			parentElement.addElement(answer);
+		}
 		
+		StringBuilder sb = new StringBuilder();
 		int sum = 0;
 		for (IntrospectedColumn introspectedColumn : columns) {
 			sum++;
@@ -76,10 +62,14 @@ public class WhereElementGenBuilder extends AbstractXmlElementGenBuilder{
            
 		}
 
-		if (!noifFlag) {
-			parentElement.addElement(answer);
-		}
-
 	}
+
+	
+
+	public void setWheres(String[] wheres) {
+		this.wheres = wheres;
+	}
+	
+	
 
 }

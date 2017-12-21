@@ -1,5 +1,7 @@
 package org.mybatis.mapper.xml;
 
+import static org.mybatis.generator.internal.util.messages.Messages.getString;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,19 +11,25 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
+import org.mybatis.generator.api.FullyQualifiedTable;
 import org.mybatis.generator.api.IntrospectedColumn;
+import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.JavaTypeResolver;
 import org.mybatis.generator.codegen.Table;
 import org.mybatis.generator.codegen.mapper.JavaMapperGenBuilder;
@@ -124,6 +132,7 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 		String sqlMap = configuration.getVariables().getProperty("sqlMap");
 		String src = configuration.getVariables().getProperty("src");
 		Table table = new Table(getCurrentTableName(), colums());
+		calculatePrimaryKey(table);
 		String[] mapperInterface =  splitDirFile(getCurrentNamespace());
 		table.setMapperPackage(mapperInterface[0]);
 		table.setMapperInterfaceName(mapperInterface[1]);
@@ -211,10 +220,33 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new BuilderException("查询表失败");
 		}
 		return answer;
 	}
+	private void calculatePrimaryKey(Table table) {
+		Configuration conf = getConfiguration();
+		DataSource dataSource = conf.getEnvironment().getDataSource();
+		List<String> answer = new ArrayList<>();
+		try (Connection con = dataSource.getConnection();) {
+			ResultSet rs = con.getMetaData().getPrimaryKeys(null, null, getCurrentTableName()); //$NON-NLS-1$
+			Map<Short, String> keyColumns = new TreeMap<Short, String>();
+            while (rs.next()) {
+                String columnName = rs.getString("COLUMN_NAME"); //$NON-NLS-1$
+                short keySeq = rs.getShort("KEY_SEQ"); //$NON-NLS-1$
+                keyColumns.put(keySeq, columnName);
+            }
+            
+            for (String columnName : keyColumns.values()) {
+            	answer.add(columnName);
+            }
+			
+		} catch (Exception e) {
+			throw new BuilderException("查询表失败");
+		}
+		table.setPrimaryKeyColumns(answer);
+		
+    }
 
 	private void javabean(IntrospectedColumn introspectedColumn) {
 		introspectedColumn.setJavaProperty(javaProperty(introspectedColumn.getActualColumnName()));

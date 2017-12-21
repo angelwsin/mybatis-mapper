@@ -2,13 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mybatis.mapper.UserMapper">
   <select id="findById" resultType="com.mybatis.model.User">
-    select id as id, user_name as userName
+    select 
+    id as id, user_name as userName
     from user
     where
     id=#{id}
   </select>
-  <select id="findList" resultType="List">
-    select id as id, user_name as userName
+  <select id="countId">
+    select 
+              count(0)
+          from user
+    <where>
+      <if test="userName != null">
+        user_name = #{userName}
+      </if>
+    </where>
+  </select>
+  <select id="findList" resultType="com.mybatis.model.User">
+    select 
+    id as id, user_name as userName
     from user
     <where>
       <if test="id != null">
@@ -18,12 +30,20 @@
         user_name = #{userName}
       </if>
     </where>
-    order by id desc
+         order by id desc
   </select>
-  <select id="update">
-    update set id = #{id}, user_name = #{userName}
-    from user
+  <update id="update">
+    update user set user_name = #{userName}
     where
     id=#{id}
-  </select>
+  </update>
+  <delete id="delete">
+    delete from user
+    where
+    id=#{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into user (user_name)
+    values (#{userName})
+  </insert>
 </mapper>

@@ -8,7 +8,13 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
     User findById(@Param("id") Integer id);
 
+    Integer countId();
+
     List<User> findList(Map<String, Object> user);
 
-    int update(@Param("id") Integer id);
+    int update(User user);
+
+    int delete(@Param("id") Integer id);
+
+    int insert(User user);
 }

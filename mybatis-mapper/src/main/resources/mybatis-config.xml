@@ -22,8 +22,8 @@
        </environment>  
     </environments>  
     <mappers>  
-     <mapper resource="user_gen.xml"/>
-      <!-- <mapper resource="sqlMap/userMapper.xml"/>  -->
+       <!-- <mapper resource="user_gen.xml"/> -->
+    <mapper resource="sqlMap/userMapper.xml"/> 
     </mappers> 
  
 </configuration>

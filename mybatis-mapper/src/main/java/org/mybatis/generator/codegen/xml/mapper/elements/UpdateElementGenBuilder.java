@@ -12,19 +12,19 @@ import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.Table;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.codegen.util.MyBatisFormattingUtilities;
-import org.mybatis.mapper.config.Const;
 
 public class UpdateElementGenBuilder extends AbstractXmlElementGenBuilder{
 
 	public UpdateElementGenBuilder(Configuration configuration, Table introspectedTable, MappedStatement mst) {
 		super(configuration, introspectedTable, mst);
-		buildes.add(new WhereElementGenBuilder(configuration,introspectedTable, mst));
+		init();
 	}
 
 	@Override
 	public void element(XmlElement parentElement) {
-		List<IntrospectedColumn> columns = getFilterColums(Const.COLUMS);
-		XmlElement answer = new XmlElement("select"); //$NON-NLS-1$
+		//Const.COLUMS
+		List<IntrospectedColumn> columns = getFilterColums(colums);
+		XmlElement answer = new XmlElement("update"); //$NON-NLS-1$
 
         answer.addAttribute(new Attribute(
                 "id", getId())); //$NON-NLS-1$
@@ -32,7 +32,7 @@ public class UpdateElementGenBuilder extends AbstractXmlElementGenBuilder{
         //context.getCommentGenerator().addComment(answer);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("update set "); //$NON-NLS-1$
+        sb.append("update ").append(introspectedTable.getRuntimeTableName()).append(" set "); //$NON-NLS-1$
         Iterator<IntrospectedColumn> iter = columns
                 .iterator();
         while (iter.hasNext()) {
@@ -50,13 +50,6 @@ public class UpdateElementGenBuilder extends AbstractXmlElementGenBuilder{
             }
         }
 
-        if (sb.length() > 0) {
-            answer.addElement(new TextElement(sb.toString()));
-        }
-
-        sb.setLength(0);
-        sb.append("from "); //$NON-NLS-1$
-        sb.append(introspectedTable.getRuntimeTableName());
         answer.addElement(new TextElement(sb.toString()));
         parentElement.addElement(answer);
         

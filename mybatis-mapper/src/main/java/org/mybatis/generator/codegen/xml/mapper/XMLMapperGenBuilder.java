@@ -1,5 +1,6 @@
 package org.mybatis.generator.codegen.xml.mapper;
 
+import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.xml.Attribute;
@@ -7,9 +8,14 @@ import org.mybatis.generator.api.dom.xml.Document;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.Table;
 import org.mybatis.generator.codegen.XmlConstants;
+import org.mybatis.generator.codegen.xml.mapper.elements.AbstractXmlElementGenBuilder;
 import org.mybatis.generator.codegen.xml.mapper.elements.AbstractXmlGenBuilder;
+import org.mybatis.generator.codegen.xml.mapper.elements.AppendElementGenBuilder;
+import org.mybatis.generator.codegen.xml.mapper.elements.DeleteElementGenBuilder;
+import org.mybatis.generator.codegen.xml.mapper.elements.InsertElementGenBuilder;
 import org.mybatis.generator.codegen.xml.mapper.elements.SelectElementGenBuilder;
 import org.mybatis.generator.codegen.xml.mapper.elements.UpdateElementGenBuilder;
+import org.mybatis.mapper.config.Const;
 
 public class XMLMapperGenBuilder extends AbstractXmlGenBuilder{
 
@@ -48,9 +54,18 @@ public class XMLMapperGenBuilder extends AbstractXmlGenBuilder{
 				update(getConfiguration(), mst,answer);
 			   }
 			   break;
+			case DELETE:{
+				delete(getConfiguration(), mst,answer);
+			   }
+			   break;
+			case INSERT:{
+				insert(getConfiguration(), mst,answer);
+			   }
+			   break;
 
 			default:
-				break;
+				throw new BuilderException(
+						"A xml mapper fail .");
 			}
         	
         }
@@ -59,6 +74,21 @@ public class XMLMapperGenBuilder extends AbstractXmlGenBuilder{
     }
 	
 	
+	
+	
+	
+	private void insert(Configuration configuration, MappedStatement mst, XmlElement parentElement) {
+		InsertElementGenBuilder insert = new InsertElementGenBuilder(configuration, introspectedTable, mst);
+		insert.element(parentElement);
+		
+	}
+
+	private void delete(Configuration configuration, MappedStatement mst, XmlElement parentElement) {
+		DeleteElementGenBuilder delete = new DeleteElementGenBuilder(configuration,introspectedTable,mst);
+		delete.element(parentElement);
+		
+	}
+
 	private void update(Configuration configuration, MappedStatement mst, XmlElement parentElement) {
 		UpdateElementGenBuilder update = new UpdateElementGenBuilder(configuration, introspectedTable, mst);
 		update.element(parentElement);

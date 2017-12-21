@@ -94,6 +94,8 @@ public class Table {
 	}
 
 	private List<IntrospectedColumn> columns;
+	
+	protected List<String> primaryKeyColumns;
 
 
 	public Table( String runtimeTableName,
@@ -147,6 +149,28 @@ public class Table {
 		return b.toString();
 	 }
 
+
+	public List<String> getPrimaryKeyColumns() {
+		return primaryKeyColumns;
+	}
+
+
+	public void setPrimaryKeyColumns(List<String> primaryKeyColumns) {
+		this.primaryKeyColumns = primaryKeyColumns;
+	}
+
+
+	
+    public IntrospectedColumn getGeneratedKey(){
+    	for(String key : primaryKeyColumns){
+    		 for(IntrospectedColumn column : columns){
+    			 if(key.equals(column.getActualColumnName())&&column.isAutoIncrement()){
+    				 return column;
+    			 }
+    		 }
+    	}
+    	return null;
+    }
 
 	
 	

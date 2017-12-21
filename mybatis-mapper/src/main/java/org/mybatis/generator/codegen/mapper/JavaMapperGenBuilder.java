@@ -2,6 +2,7 @@ package org.mybatis.generator.codegen.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
 import org.mybatis.generator.api.dom.java.CompilationUnit;
@@ -59,15 +60,36 @@ public class JavaMapperGenBuilder extends AbstractJavaGenBuilder{
 				update(getConfiguration(), mst,interfaze);
 			   }
 			   break;
+			case DELETE:{
+				delete(getConfiguration(), mst,interfaze);
+			   }
+			   break;
+			case INSERT:{
+				insert(getConfiguration(), mst,interfaze);
+			   }
+			   break;
 
 			default:
-				break;
+				throw new BuilderException(
+						"A mapper fail .");
 			}
         	
         }
 
         return interfaze;
     }
+
+	private void insert(Configuration configuration, MappedStatement mst, Interface interfaze) {
+		InsertMethodGenBuilder insert = new InsertMethodGenBuilder(configuration, mst, introspectedTable);
+		insert.addInterfaceElements(interfaze);
+		
+	}
+
+	private void delete(Configuration configuration, MappedStatement mst, Interface interfaze) {
+		DeleteMethodGenBuilder delete = new DeleteMethodGenBuilder(configuration, mst, introspectedTable);
+		delete.addInterfaceElements(interfaze);
+		
+	}
 
 	private void update(Configuration configuration, MappedStatement mst, Interface interfaze) {
 		UpdateMethodGenBuilder update = new UpdateMethodGenBuilder(configuration, mst, introspectedTable);

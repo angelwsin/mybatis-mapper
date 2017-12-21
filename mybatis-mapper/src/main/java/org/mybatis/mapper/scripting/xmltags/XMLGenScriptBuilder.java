@@ -17,11 +17,8 @@ import org.apache.ibatis.scripting.xmltags.IfSqlNode;
 import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SetSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
-import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
-import org.apache.ibatis.scripting.xmltags.TextSqlNode;
 import org.apache.ibatis.scripting.xmltags.TrimSqlNode;
 import org.apache.ibatis.scripting.xmltags.VarDeclSqlNode;
-import org.apache.ibatis.scripting.xmltags.WhereSqlNode;
 import org.apache.ibatis.session.Configuration;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,7 +40,7 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	  }
 
 	  public SqlSource parseScriptNode() {
-	    List<SqlNode> contents = parseDynamicAttrs(context);
+	    List<SqlNode> contents = parseDynamicTags(context);
 	    MixedSqlNode rootSqlNode = new MixedSqlNode(contents);
 	    SqlSource sqlSource = null;
 	    if (isDynamic) {
@@ -63,13 +60,8 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	      XNode child = node.newXNode(children.item(i));
 	      if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
 	        String data = child.getStringBody("");
-	        TextSqlNode textSqlNode = new TextSqlNode(data);
-	        if (textSqlNode.isDynamic()) {
-	          contents.add(textSqlNode);
-	          isDynamic = true;
-	        } else {
-	          contents.add(new StaticTextSqlNode(data));
-	        }
+	        TextGenSqlNode textSqlNode = new TextGenSqlNode(data);
+	        contents.add(textSqlNode);
 	      } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628
 	        String nodeName = child.getNode().getNodeName();
 	        NodeHandler handler = nodeHandlers(nodeName);
@@ -77,7 +69,7 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	          throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
 	        }
 	        handler.handleNode(child, contents);
-	        isDynamic = true;
+	        //isDynamic = true;
 	      }
 	    }
 	    return contents;
@@ -112,9 +104,11 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	    Map<String, NodeHandler> map = new HashMap<String, NodeHandler>();
 	    map.put("trim", new TrimHandler());
 	    map.put("where", new WhereHandler());
+	    map.put("colums", new ColumnsHandler());
 	    map.put("set", new SetHandler());
 	    map.put("foreach", new ForEachHandler());
 	    map.put("if", new IfHandler());
+	    map.put("noif", new NoIfHandler());
 	    map.put("choose", new ChooseHandler());
 	    map.put("when", new IfHandler());
 	    map.put("otherwise", new OtherwiseHandler());
@@ -157,6 +151,17 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	      targetContents.add(trim);
 	    }
 	  }
+	  private class ColumnsHandler implements NodeHandler {
+		    public ColumnsHandler() {
+		      // Prevent Synthetic Access
+		    }
+
+		    @Override
+		    public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+		    	String colums = nodeToHandle.getStringAttribute("cols");
+		        targetContents.add(new ColumsGenSqlNode(colums));
+		    }
+		  }
 
 	  private class WhereHandler implements NodeHandler {
 	    public WhereHandler() {
@@ -165,10 +170,9 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 
 	    @Override
 	    public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
-	      List<SqlNode> contents = parseDynamicTags(nodeToHandle);
-	      MixedSqlNode mixedSqlNode = new MixedSqlNode(contents);
-	      WhereSqlNode where = new WhereSqlNode(configuration, mixedSqlNode);
-	      targetContents.add(where);
+	    	 String where = nodeToHandle.getStringAttribute("cols");
+	    	 WhereGenSqlNode wherenode = new WhereGenSqlNode(where);
+	      targetContents.add(wherenode);
 	    }
 	  }
 
@@ -220,6 +224,18 @@ public class XMLGenScriptBuilder extends BaseBuilder {
 	      targetContents.add(ifSqlNode);
 	    }
 	  }
+	  
+	  private class NoIfHandler implements NodeHandler {
+		    public NoIfHandler() {
+		      // Prevent Synthetic Access
+		    }
+
+		    @Override
+		    public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+		    	String noif = nodeToHandle.getStringAttribute("cols");
+		        targetContents.add(new NoIfGenSqlNode(noif));
+		    }
+		  }
 
 	  private class OtherwiseHandler implements NodeHandler {
 	    public OtherwiseHandler() {
