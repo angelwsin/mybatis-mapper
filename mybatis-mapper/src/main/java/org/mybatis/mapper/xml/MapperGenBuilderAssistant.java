@@ -280,10 +280,11 @@ public class MapperGenBuilderAssistant extends MapperBuilderAssistant {
 					ParameterMapping parameterMapping = buildParameterMapping(parameterClass, property, javaTypeClass,
 							jdbcTypeEnum, null, null, typeHandlerClass, null);
 					parameterMappings.add(parameterMapping);
-					addParameterMap(id, parameterClass, parameterMappings);
+					
 				}
 			}
 		}
+		addParameterMap(id, parameterClass, parameterMappings);
 
 	}
 

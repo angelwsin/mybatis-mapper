@@ -62,7 +62,8 @@ public class SelectMethodGenBuilder extends AbstractJavaMapperMethodGenBuilder {
 			paramterTypes(importedTypes,method);
 		}else if(Object.class.getName().equals(resultmap.getType().getName())){
 			FullyQualifiedJavaType listType = new FullyQualifiedJavaType(introspectedTable.getBeanNamespace());
-			method.setReturnType(listType);
+			importedTypes.add(listType);
+			method.setReturnType(new FullyQualifiedJavaType(listType.getShortName()));
 			paramterTypes(importedTypes,method);
 		}else{
 			FullyQualifiedJavaType listType = new FullyQualifiedJavaType(resultmap.getType().getSimpleName());

@@ -65,13 +65,13 @@ public abstract class AbstractJavaMapperMethodGenBuilder extends AbstractGenBuil
 		}else{
 			if(Object.class.getName().equals(mst.getParameterMap().getType().getName())){
 				FullyQualifiedJavaType param = new FullyQualifiedJavaType(introspectedTable.getBeanNamespace());
-				method.addParameter(new Parameter(param, introspectedTable.getRuntimeTableName()));
+				method.addParameter(new Parameter(param, introspectedTable.paramName()));
 			}else if(Map.class.isAssignableFrom(mst.getParameterMap().getType())){
 				importedTypes.add(FullyQualifiedJavaType.getNewMapInstance());
 				FullyQualifiedJavaType param = new FullyQualifiedJavaType(Map.class.getSimpleName());
 				param.addTypeArgument(FullyQualifiedJavaType.getStringInstance());
 				param.addTypeArgument(FullyQualifiedJavaType.getObjectInstance());
-				method.addParameter(new Parameter(param, introspectedTable.getRuntimeTableName()));
+				method.addParameter(new Parameter(param, introspectedTable.paramName()));
 			}
 			
 		}

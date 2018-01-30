@@ -148,7 +148,14 @@ public class Table {
 		}
 		return b.toString();
 	 }
-
+	public String  paramName(){
+		String[] c =  runtimeTableName.split("_");
+		StringBuilder b = new StringBuilder();
+		for(int i=0;i<c.length;i++){
+			b.append(c[i].substring(0, 1).toLowerCase()).append(c[i].substring(1));
+		}
+		return b.toString();
+	 }
 
 	public List<String> getPrimaryKeyColumns() {
 		return primaryKeyColumns;
